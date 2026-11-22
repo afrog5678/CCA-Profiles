@@ -1,0 +1,394 @@
+---
+output: html_document
+params:
+  cca: "West Garfield Park"
+---
+
+```{r message=FALSE, include=FALSE, echo=FALSE}
+title_var <- "West Garfield Park"
+```   
+
+---
+title: `r title_var`
+---
+
+<!--- Code to set font --->
+<style>
+  .title{
+    display: none;
+  }
+</style>
+
+<style>
+body{
+font-family: "Arial"
+}
+table, td, th {
+font-family: "Arial"
+}
+p{
+font-family: "Arial"
+line-height: 1.5
+}
+
+
+<!--- Code to set-up for html display --->
+
+.row {
+display: flex;
+align-items: stretch;
+}
+.col {
+flex: 1;
+}
+.same-height {
+height: 100%;
+}
+img.same-height{
+object-fit: contain;
+max-width: 100%;
+}
+
+<!--- Code for table display --->
+table {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 18px;
+}
+
+
+thead th {
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+tbody td {
+    padding: 7px 10px;
+}
+
+tbody td:nth-child(2),
+tbody td:nth-child(3) {
+    text-align: right;
+}
+
+tbody tr:last-child td {
+    border-bottom: 2px solid #000;
+}
+
+</style>
+
+```{r first, include=FALSE, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup, include=FALSE, echo=FALSE, message=FALSE}
+library(plotly);library(gt)
+source("R/helper_functions.R")
+source("R/plotting_functions.R")
+load_data(); cca<-params$cca
+```
+
+```{r include=FALSE, echo=FALSE, message=FALSE}
+le_2024 <- lifeexp %>%
+  dplyr::filter(
+    CCA == cca,
+    Year == 2024
+  ) %>%
+  dplyr::pull(le)
+
+le_2024 <- round(le_2024[1], 1)
+
+intro <- narratives %>%
+  dplyr::filter(
+    CCA == cca
+  ) %>%
+  dplyr::pull(Intro)
+
+racedemo <- narratives %>%
+  dplyr::filter(
+    CCA == cca) %>%
+  dplyr::pull(Race_Ethnicity_Description)
+
+sexdemo <- narratives %>%
+  dplyr::filter(
+    CCA == cca) %>%
+  dplyr::pull(Sex_Description)
+
+agedemo <- narratives %>%
+  dplyr::filter(
+    CCA == cca) %>%
+  dplyr::pull(Age_Description)
+
+lenarrative <- narratives %>%
+  dplyr::filter(
+    CCA == cca) %>%
+      dplyr::pull(lenarrative)
+
+lcodnarrative <- narratives %>%
+  dplyr::filter(
+    CCA == cca) %>%
+      dplyr::pull(lcodnarrative)
+
+lcodovertime <- narratives %>%
+  dplyr::filter(
+    CCA == cca) %>%
+      dplyr::pull(lcodovertime)
+
+```
+
+
+```{=html}
+<div style="background:white; padding-top: 12px;">
+  <div style="display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background:#41B6E6;
+  padding: 12px;
+  ">
+
+    <h2 style="font-size:75px; color:#F2F7EB; font-family: Arial; line-height:1.1; margin:0; max-width: 75%; padding: 10px 0;">
+```
+`r cca`
+```{=html}
+    </h2>
+  
+    <div style="text-align:right;">
+          <div style="font-size:20px; color:#F2F7EB;">
+      2024 Life Expectancy
+      </div>
+      <div style="font-size:75px; font-weight:bold; line-height:1.1; color:#333333;">
+```
+`r le_2024`
+```{=html}
+      </div>
+    </div>
+  
+  </div>
+</div>
+```
+
+<div style="margin-bottom:25px;"></div>
+
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r intro`
+```{=html}
+ </div>
+```
+
+
+```{r, echo=FALSE, out.width="100%", message=FALSE, fig.align="left", results='hide', warning=FALSE}
+
+chicago_file <- tempfile(fileext = ".png")
+cca_file <- tempfile(fileext = ".png")
+
+chi <- plot_chicago_map(cca)
+
+chi <- chi +
+  theme(
+    plot.margin = margin(0, 0, 0, 0),
+    panel.spacing = unit(0, "pt")
+  )
+
+cca_map <- plot_cca_zoom(cca)
+
+  ggsave(
+    filename = chicago_file,
+    plot = chi,
+    width = 6,
+    height = 6,
+    dpi = 300)
+  
+  ggsave(
+    filename = cca_file,
+    plot = cca_map,
+    width = 5,
+    height = 5,
+    dpi = 300)
+```
+
+<div style="margin-bottom:25px;"></div>
+
+<div style="display:flex;
+            align-items:center;">
+
+<div style="width:60%;">
+
+```{r, echo=FALSE, out.width="100%", message=FALSE, fig.align="left", warning=FALSE}
+knitr::include_graphics(chicago_file)
+```
+
+</div>
+
+<div style="width:40%;">
+
+```{r, echo=FALSE, out.width="100%", message=FALSE}
+knitr::include_graphics(cca_file)
+```
+
+</div>
+
+</div>
+
+<div style="font-size:20px; color: #000000;">
+
+The first map displayed above shows the City of Chicago with Chicago Community Area life expectancy measures from 2024. `r cca` is outlined in red. To the right of the map of Chicago, a magnified map of `r cca` is shown.
+
+The life expectancy, or average number of years a person may expect to live, for `r cca` was `r le_2024` in 2024 based on CHA methodology. Life expectancy is a measure commonly used to understand the general health of communities. When looking at a hyperlocal level in Chicago, clear disparities exist which may be explained by examining what health outcomes and conditions are exacerbating this gap.
+</div>
+
+<div style="margin-bottom:50px;"></div>
+
+
+<!-- Race/Ethnicity -->
+
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+<div style="margin-bottom:-10px;"></div>
+<h1 style="text-align: center; font-size: 28px; color: #000000;">Demographics</h1>
+<div style="margin-bottom:-10px;"></div>
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+
+<div style="margin-bottom:25px;"></div>
+
+<h2 style="text-align: center; font-size: 20px; color: #000000;">Percentage of Residents by Race/Ethnicity (2020-2024)</h2>
+```{r Race, echo=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.align='center'}
+plot_race(cca)
+```
+
+<div style="margin-bottom:25px;"></div>
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r racedemo`
+```{=html}
+ </div>
+```
+<div style="margin-bottom:75px;"></div>
+<!-- Sex -->
+<h2 style="text-align: center; font-size: 20px; color: #000000;">Percentage of Residents by Sex (2020-2024)</h2>
+```{r Sex, echo=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.align='center'}
+plot_sex(cca)
+```
+
+<div style="margin-bottom:25px;"></div>
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r sexdemo`
+```{=html}
+ </div>
+```
+<div style="margin-bottom:75px;"></div>
+<!-- Age -->
+<h2 style="text-align: center; font-size: 20px; color: #000000;">Percentage of Residents by Age (2020-2024)</h2>
+```{r Age, echo=FALSE, message=FALSE, fig.width=9, fig.height=5, fig.align='center'}
+plot_age(cca)
+```
+
+<div style="margin-bottom:25px;"></div>
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r agedemo`
+```{=html}
+ </div>
+```
+<div style="margin-bottom:50px;"></div>
+
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+<div style="margin-bottom:-10px;"></div>
+<h1 style="text-align: center; font-size: 28px; color: #000000;">Life Expectancy</h1>
+<div style="margin-bottom:-10px;"></div>
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+
+<div style="margin-bottom:25px;"></div>
+
+<!-- Life Expectancy -->
+```{r le, echo=FALSE, message=FALSE, fig.width=9, fig.align='center'}
+plot_lifeexp(cca)
+```
+
+<div style="margin-bottom:25px;"></div>
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r lenarrative`
+```{=html}
+ </div>
+```
+<div style="margin-bottom:50px;"></div>
+
+<!-- LCOD -->
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+<div style="margin-bottom:-10px;"></div>
+<h1 style="text-align: center; font-size: 28px; color: #000000;">Leading Causes of Death</h1>
+<div style="margin-bottom:-10px;"></div>
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+
+<div style="margin-bottom:25px;"></div>
+
+<h2 style="text-align: center; font-size: 20px; color: #000000;">Leading Causes of Death Mortality Rates (2020-2024)</h2>
+```{r lcodtable, echo=FALSE, message=FALSE}
+make_lcod_table(cca)
+```
+
+<div style="margin-bottom:25px;"></div>
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r lcodnarrative`
+```{=html}
+ </div>
+```
+
+<div style="margin-bottom:50px;"></div>
+
+```{r lcodot, echo=FALSE, message=FALSE, fig.width=9}
+plot_lcod_overtime(cca)
+```
+
+```{=html}
+<div style="font-size:20px; color: #000000;">
+```
+`r lcodovertime`
+```{=html}
+ </div>
+```
+
+<div style="margin-bottom:50px;"></div>
+
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+<div style="margin-bottom:-10px;"></div>
+<h1 style="text-align: center; font-size: 32px; color: #000000;">Additional Resources</h1>
+<div style="margin-bottom:-10px;"></div>
+<hr style="border: none; border-top: 4px double black; width: 90%;" />
+
+<div style="margin-bottom:25px;"></div>
+
+<h2 style="text-align: center; font-size: 20px; color: #000000;">Resources for the Leading Causes of Death</h2>
+
+```{r resources, echo=FALSE, message=FALSE, fig.width=6}
+make_resource_table()
+```
+
+<div style="margin-bottom:25px;"></div>
+
+<!-- Links for CHA related topic pages -->
+
+<div style="font-size: 20px; color: #000000;">
+The Chicago Health Atlas [Leading Cause of Death](https://chicagohealthatlas.org/cod) topic page presents Vital Statistics data from the Illinois Department of Public Health (IDPH) by total population and race/ethnicity. The [Life Expectancy](https://chicagohealthatlas.org/life-expectancy) topic page presents life expectancy data calculated from the Illinois Department of Public Health's 2022-2023 death certificate data as well as the U.S. Census Bureau's 2020 decennial census data.
+</div>
