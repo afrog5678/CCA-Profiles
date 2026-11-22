@@ -1,4 +1,4 @@
-setwd("C:/Users/noahm/OneDrive - University of Illinois Chicago/PHAME/Planning/Funding/Sprague/Community Reports/CCA_Profile_Implemented")
+setwd()
 
 load_data <- function(){
  demographics <<- read.csv("data/demographics.csv")
